@@ -579,6 +579,24 @@ function OnPs5Body() {
           {loading
             ? tr("hub_checking", undefined, "Checking what is on this PS5…")
             : tr("hub_count", { n: count }, `${count} on this PS5`)}
+          {/* The count takes in Payload Manager's saved rows, which live inside its card: with
+              the card closed, this opens them. */}
+          {!loading && pmList && pmList.length > 0 && pmCardShown && openCard !== "payload-manager" && (
+            <>
+              {" · "}
+              <button
+                type="button"
+                className="underline underline-offset-2 hover:text-[var(--color-text)]"
+                onClick={() => setOpen("payload-manager")}
+              >
+                {tr(
+                  "hub_show_saved",
+                  { n: pmList.length },
+                  `Show the ${pmList.length} saved in Payload Manager`,
+                )}
+              </button>
+            </>
+          )}
         </span>
         <Button
           variant="secondary"

@@ -179,3 +179,21 @@ test("On your PS5 shows each saved running payload once, on its Payload Manager 
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
   expect(overflow).toBeLessThanOrEqual(0);
 });
+
+test("With Payload Manager's card closed, the count's link opens its saved payloads", async ({ page }) => {
+  await mockConsole(page);
+  await page.setViewportSize({ width: 1280, height: 1400 });
+  await page.goto("/payloads?tab=ps5", { waitUntil: "domcontentloaded" });
+
+  const root = page.locator("[data-scroll-root]:visible");
+  // The count takes in the four saved rows, which sit inside the closed card.
+  await expect(root.getByText("6 on this PS5")).toBeVisible({ timeout: 30_000 });
+  await expect(root.getByText("Running · PID 102")).toHaveCount(0);
+
+  await root.getByRole("button", { name: "Show the 4 saved in Payload Manager" }).click();
+  await expect(page).toHaveURL(/open=payload-manager/);
+  await expect(root.getByText("Running · PID 102")).toBeVisible();
+  await expect(root.getByText("Running · PID 103")).toBeVisible();
+  // Open now: the link has done its job.
+  await expect(root.getByRole("button", { name: /saved in Payload Manager/ })).toHaveCount(0);
+});
